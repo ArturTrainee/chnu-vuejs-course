@@ -1,18 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" xml:lang="en">
 <head>
   <title>A Vue.js Calculator</title>
   <style>
     p, input { font-family: monospace; }
     p { white-space: pre; }
+    .error { color: rgb(255, 0, 0); }
   </style>
 </head>
 <body>
   <div id="app">
     <p>x <input v-model="x"></p>
     <p>y <input v-model="y"></p>
+    <p>operation <input v-model="operand" /></p>
     <p>---------------------</p>
     <p>= <span v-text="result"></span></p>
+    <p><span class="error" v-text="errorMessage"></span></p>
   </div>
 
   <script src="https://unpkg.com/vue/dist/vue.js"></script>
@@ -22,20 +25,25 @@
   }
     var calc = new Vue({
       el: '#app',
-      data: { x: 0, y: 0, lastResult: 0 },
+      data: { x: 0, y: 0, operand: "+", errorMessage: ""},
       computed: {
         result: function() {
+          this.errorMessage = "";
           let x = parseFloat(this.x);
-          if(isNotNumericValue(x))
-          return this.lastResult;
-
+          if (isNotNumericValue(x))
+            this.errorMessage += "Invalid number '" + this.x + "'!\n";
           let y = parseFloat(this.y);
-          if(isNotNumericValue(y))
-          return this.lastResult;
-
-          this.lastResult = x + y;
-
-          return this.lastResult;
+          if (isNotNumericValue(y))
+            this.errorMessage += "Invalid number '" + this.y + "'!\n";
+          switch (this.operand) {
+            case "+": return x + y;
+            case "-": return x - y;
+            case "*": return x * y;
+            case "/": return x / y;
+            default:
+              this.errorMessage += "Invalid operation '" + this.operand + "'!";
+              return;
+          }
         }
       }
     });
