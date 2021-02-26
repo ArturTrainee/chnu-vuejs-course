@@ -10,19 +10,22 @@
   <link rel="stylesheet"
         href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
         crossorigin="anonymous">
+  <style>
+  .welcome-msg { text-align: center; font-weight: 600; font-size: 18; color: green; padding-bottom: 3vh; }
+  </style>
 </head>
 
 <body>
   <div id="app">
     <header>
       <div class="navbar navbar-default">
-        <div class="navbar-header">
-          <h1 v-text="sitename"></h1>
-          <p>Ласкаво просимо у {{sitename}}</p>
-        </div>
+          <div class="container-fluid">
+            <h1 v-text="sitename"></h1>
+          </div>
       </div>
     </header>
     <main>
+      <p class="welcome-msg">Ласкаво просимо у {{sitename}}!</p>
       <div class="row">
         <div class="col-md-2 col-md-offset-1">
           <figure>
