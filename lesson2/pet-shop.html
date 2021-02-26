@@ -41,6 +41,8 @@
             <!-- застосовуємо фільтр -->
             {{ product.price | formatPrice }}
           </p>
+          <p>Час відвантаження: <strong>09:00 - 14:00</strong></p>
+          <p><strong>Товар {{ new Date() | displayProductDeliveryStatus }}</strong></p>
         </div>
       </div>
     </main>
@@ -78,6 +80,15 @@
         },
         formatProductTitle: function(title) {
           return `<span style="font-style: italic;">${title}</span>`;
+        },
+        displayProductDeliveryStatus: function(currentDate) {
+          const startDeliveryDate = new Date();
+          startDeliveryDate.setHours(9, 0, 0);
+          const endDeliveryDate = new Date();
+          endDeliveryDate.setHours(14, 0, 0);
+          return (currentDate <= startDeliveryDate || currentDate >= endDeliveryDate)
+            ? "зараз відвантажити неможливо"
+            : "можна відвантажити";
         }
       }
     });
