@@ -12,6 +12,7 @@
         crossorigin="anonymous">
   <style>
   .welcome-msg { text-align: center; font-weight: 600; font-size: 18; color: green; padding-bottom: 3vh; }
+  .product-title { color: #025a02; }
   </style>
 </head>
 
@@ -34,7 +35,7 @@
         </div>
         <div class="col-md-6 col-md-offset-2 description">
           <!-- застосовуємо синтаксис Mustache -->
-          <h1>{{ product.title }}</h1>
+          <h1 class="product-title" v-html="$options.filters.formatProductTitle(product.title)"></h1>
           <p  v-html="product.description"></p>
           <p  class="price">
             <!-- застосовуємо фільтр -->
@@ -74,6 +75,9 @@
           } else {
             return "$" + (price / 100).toFixed(2);
           }
+        },
+        formatProductTitle: function(title) {
+          return `<span style="font-style: italic;">${title}</span>`;
         }
       }
     });
