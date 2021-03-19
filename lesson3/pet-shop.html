@@ -30,11 +30,34 @@
             </span>
             Checkout
           </button>
+          <div class="form-group">
+            <div class="col-md-6 boxes">
+              <input
+               type="checkbox"
+               id="prod-ids-checkbox"
+               value="false"
+               v-model="showCartProductsIds"
+               v-on:click="onCartCheckboxClick"
+               />
+              <label for="prod-ids-checkbox">показати id доданих товарів</label>
+            </div>
+          </div>
         </div>
       </div>
     </header>
     <main>
       <!-- 4) додаємо директиву v-if -->
+      <div v-if="showCartProductsIds" class="row">
+        <div class="col-md-2 col-md-offset-1">
+          <h4>ID доданих товарів:</h4>
+          <div v-if="cartItemCount == 0">
+            <p>Ви ще не додали товарів в корзину!</p>
+          </div>
+          <div v-if="cartItemCount > 0" v-for="productId in cart">
+            <p>{{ productId }}</p>
+          </div>
+        </div>
+      </div>
       <div v-if="showProduct" class="row">
         <div class="col-md-2 col-md-offset-1">
           <figure>
@@ -80,6 +103,7 @@
         cart: [],
         // 1) властивість, що відповідає за відображення сторінки товару
         showProduct: true,
+        showCartProductsIds: false,
         firstName: 'Summer',
         lastName: 'Winters',
         prefix: 'Ms',
@@ -118,6 +142,9 @@
         },
         canClearCart: function() {
           return this.cart.length > 0;
+        },
+        onCartCheckboxClick() {
+          this.showCartProductsIds = !this.showCartProductsIds;
         }
       },
       computed: {
