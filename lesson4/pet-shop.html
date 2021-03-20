@@ -1,0 +1,282 @@
+<html>
+
+<!-- 4.3.1, 4.3.2 -->
+<!-- використання модифікаторів .number, .trim, .lazy -->
+
+<head>
+  <meta charset="UTF-8">
+  <title>Vue.js Pet Depot</title>
+  <script src="https://unpkg.com/vue"></script>
+  <link rel="stylesheet" type="text/css" href="assets/css/app.css"/>
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        crossorigin="anonymous">
+</head>
+
+<body>
+  <div id="app">
+    <header>
+      <div class="navbar navbar-default">
+        <div class="navbar-header">
+          <h1 v-text="sitename"></h1>
+          <p>Ласкаво просимо {{fullName}} у {{sitename}}</p>
+        </div>
+        <div class="nav navbar-nav navbar-right cart">
+          <button type="button" class="btn btn-default btn-lg"
+                  v-on:click="showCheckout">
+            <span class="glyphicon glyphicon-shopping-cart">
+              {{ cartItemCount }}
+            </span>
+            Checkout
+          </button>
+        </div>
+      </div>
+    </header>
+    <main>
+      <div v-if="showProduct" class="row">
+        <div class="col-md-2 col-md-offset-1">
+          <figure>
+            <img v-bind:src="product.image">
+          </figure>
+        </div>
+        <div class="col-md-6 col-md-offset-2 description">
+          <h1>{{ product.title }}</h1>
+          <p  v-html="product.description"></p>
+          <p  class="price">
+            {{ product.price | formatPrice | inToOut }}
+          </p>
+          <button class="btn btn-primary active"
+                  v-on:click="addToCart"
+                  v-if="canAddToCart">Add to cart</button>
+          <button class="btn btn-primary disabled" v-else>Add to cart</button>
+        </div>
+      </div>
+      <div v-else="showProduct">
+        <div class="col-md-6">
+          <strong>First Name:</strong>
+          <!-- 2) використання модифікатора .trim -->
+          <input v-model.trim="order.firstName" class="form-control">
+        </div>
+        <div class="col-md-6">
+          <strong>Last Name:</strong>
+          <!-- 2) використання модифікатора .trim -->
+          <input v-model.trim="order.lastName" class="form-control">
+        </div>
+        <div class="form-group">
+          <div class="col-md-12"><strong>Address:</strong></div>
+          <div class="col-md-12">
+            <!-- 4) використання модифікаторів .lazy, .trim -->
+            <input v-model.trim.lazy="order.address" class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-md-12"><strong>City:</strong></div>
+          <div class="col-md-12">
+            <!-- 3) використання модифікатора .lazy -->
+            <input v-model.lazy="order.city" class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-md-2">
+            <strong>State:</strong>
+            <select v-model="order.state" class="form-control">
+              <option disaЬled value="">State</option>
+              <option v-for="(state,key) in states"
+                      v-bind:value="state">{{key}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-md-6 col-md-offset-4">
+            <strong>Zip / Postal Code:</strong>
+            <!-- 1.1) використання модифікатора .number -->
+            <input v-model.number="order.zip" class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-md-6 boxes">
+            <input type="checkbox" id="gift" value="true"
+                   v-bind:true-value="order.sendGift"
+                   v-bind:false-value="order.dontSendGift"
+                   v-model="order.gift">
+            <label for="gift">відправити як подарунок</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-md-6 boxes">
+            <input type="radio" id="home"
+                   v-bind:value="order.home"
+                   v-model="order.method">
+            <label for="home">Home</label>
+            <input type="radio" id="business"
+                   v-bind:value="order.business"
+                   v-model="order.method">
+            <label for="business">Business</label>
+          </div>
+        </div>
+        <div class="form-group col-md-6">
+          <div class="container btn-group" role="group">
+            <button type="submit" class="btn btn-primary submit form-control"
+             v-on:click="submitForm">Place Order</button>
+            <button type="button" class="btn btn-danger form-control"
+             v-on:click="rejectForm">Reject Order</button>
+          </div>
+        </div>
+        <div class="col-md-12 verify">
+          <pre>
+                        First Name: {{order.firstName}}
+                         Last Name: {{order.lastName}}
+                           Address: {{order.address}}
+                              City: {{order.city}}
+                        <!-- 1.2) вивід типу отриманого значення -->
+                               Zip: {{typeof(order.zip)}}
+                             State: {{order.state}}
+                              Gift: {{order.gift}}
+                            Method: {{order.method}}
+                  Замовлені товари: 
+                  <span v-if="cartItemsOccurrences.length > 0" v-for="item in cartItemsOccurrences">
+                    {{item.title}} ({{item.count}})
+                  </span>
+ Дата та час формування замовлення: {{order.createdAt}}
+          </pre>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="text/javascript">
+    var webstore = new Vue({
+      el: '#app',
+      data: {
+        sitename: 'Vue.js Pet Depot',
+        showProduct: true,
+        product: {
+          id: 1001,
+          title: 'Cat Food, 25lb bag',
+          description: "A 25 pound bag of <em>irresistible</em>," +
+                       "organic goodness for your cat",
+          price: 2000,
+          image: "assets/images/product-fullsize.png",
+          availableInventory: 5
+        },
+        products: [],
+        order: {
+          firstName: '',
+          lastName: '',
+          address: '',
+          city: '',
+          zip: '',
+          state: '',
+          gift: 'Відправити у подарунковій упаковці.',
+          sendGift: 'Відправити у подарунковій упаковці.',
+          dontSendGift: 'Відправити у звичайній упаковці.',
+          method: 'Домашня адреса',
+          home: 'Домашня адреса',
+          business: 'Робоча адреса',
+          createdAt: '-'
+        },
+        states: {
+          AL: 'Alabama',
+          AR: 'Arizona',
+          CA: 'California',
+          NV: 'Nevada'
+        },
+        cart: [],
+        firstName: 'Summer',
+        lastName: 'Winters',
+        prefix: 'Ms',
+        emal: 'sw@vue.js',
+        password: '123456'
+      },
+      filters: {
+        formatPrice: function(price) {
+          if(!parseInt(price)) { return ""; }
+          if(price > 99999) {
+            var priceString = (price / 100).toFixed(2);
+            var priceArray = priceString.split("").reverse();
+            var index = 3;
+            while( priceArray.length > index + 3) {
+              priceArray.splice(index+3, 0, ",");
+              index += 4;
+            }
+            return "$" + priceArray.reverse().join("");
+          } else {
+            return "$" + (price / 100).toFixed(2);
+          }
+        },
+        inToOut: function(s) {
+          return s
+        }
+      },
+      created: function () {
+        this.products.push(this.product);
+      },
+      methods: {
+        addToCart: function() {
+          this.cart.push( this.product.id );
+        },
+        showCheckout() {
+          this.showProduct = this.showProduct ? false : true;
+        },
+        submitForm() {
+          this.order.createdAt = new Date().toString();
+          alert('OK!');
+        },
+        rejectForm() {
+          this.order.createdAt = '-';
+          alert('Order was rejected!');
+        }
+      },
+      computed: {
+        fullName: function() {
+          return [this.firstName, this.lastName].join(' ');
+        },
+        fullNameWithPrefix: function() {
+          return [this.prefix + '.', this.lastName].join(' ');
+        },
+        cartItemCount: function() {
+          return this.cart.length || '';
+        },
+        canAddToCart: function() {
+          return this.product.availableInventory > this.cartItemCount;
+        },
+        // cartItemsOccurrences: function() {
+        //   const itemsNames = [];
+        //   let prevName;
+        //   this.cart.sort();
+        //   for (let i = 0; i < this.cart.length; i++) {
+        //     const itemId = this.cart[i];
+        //     const productInfo = this.products.find(p => p.id === itemId);
+        //     if (productInfo.title !== prevName) {
+        //       itemsNames.push(productInfo.title);
+        //     }
+        //     prevName = productInfo.title;
+        //   }
+        //   return itemsNames || '-';
+        // }
+        cartItemsOccurrences: function() {
+          const cartItemsOccurrences = [];
+          let prevName;
+          this.cart.sort();
+          for (let i = 0; i < this.cart.length; i++) {
+            const itemId = this.cart[i];
+            const productInfo = this.products.find(p => p.id === itemId);
+            if (productInfo.title !== prevName) {
+              cartItemsOccurrences.push({
+                title: productInfo.title,
+                count: 1
+              });
+            } else {
+              cartItemsOccurrences[cartItemsOccurrences.length - 1].count += 1;
+            }
+            prevName = productInfo.title;
+          }
+          return cartItemsOccurrences;
+        }
+      }
+    });
+  </script>
+
+</body>
+
+</html>
