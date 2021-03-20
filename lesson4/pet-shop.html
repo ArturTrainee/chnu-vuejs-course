@@ -133,7 +133,10 @@
                              State: {{order.state}}
                               Gift: {{order.gift}}
                             Method: {{order.method}}
-                  Замовлені товари: {{cartItemsNames}}
+                  Замовлені товари: 
+                  <span v-if="cartItemsOccurrences.length > 0" v-for="item in cartItemsOccurrences">
+                    {{item.title}} ({{item.count}})
+                  </span>
  Дата та час формування замовлення: {{order.createdAt}}
           </pre>
         </div>
@@ -237,19 +240,38 @@
         canAddToCart: function() {
           return this.product.availableInventory > this.cartItemCount;
         },
-        cartItemsNames: function() {
-          const itemsNames = [];
+        // cartItemsOccurrences: function() {
+        //   const itemsNames = [];
+        //   let prevName;
+        //   this.cart.sort();
+        //   for (let i = 0; i < this.cart.length; i++) {
+        //     const itemId = this.cart[i];
+        //     const productInfo = this.products.find(p => p.id === itemId);
+        //     if (productInfo.title !== prevName) {
+        //       itemsNames.push(productInfo.title);
+        //     }
+        //     prevName = productInfo.title;
+        //   }
+        //   return itemsNames || '-';
+        // }
+        cartItemsOccurrences: function() {
+          const cartItemsOccurrences = [];
           let prevName;
           this.cart.sort();
           for (let i = 0; i < this.cart.length; i++) {
             const itemId = this.cart[i];
             const productInfo = this.products.find(p => p.id === itemId);
             if (productInfo.title !== prevName) {
-              itemsNames.push(productInfo.title);
+              cartItemsOccurrences.push({
+                title: productInfo.title,
+                count: 1
+              });
+            } else {
+              cartItemsOccurrences[cartItemsOccurrences.length - 1].count += 1;
             }
             prevName = productInfo.title;
           }
-          return itemsNames.toString() || '-';
+          return cartItemsOccurrences;
         }
       }
     });
