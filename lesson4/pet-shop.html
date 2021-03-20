@@ -114,24 +114,27 @@
             <label for="business">Business</label>
           </div>
         </div>
-        <div class="form-group">
-          <div class="col-md-6">
-            <button type="submit" class="btn btn-primary submit"
-                    v-on:click="submitForm">Place Order</button>
+        <div class="form-group col-md-6">
+          <div class="container btn-group" role="group">
+            <button type="submit" class="btn btn-primary submit form-control"
+             v-on:click="submitForm">Place Order</button>
+            <button type="button" class="btn btn-danger form-control"
+             v-on:click="rejectForm">Reject Order</button>
           </div>
         </div>
         <div class="col-md-12 verify">
           <pre>
-            First Name: {{order.firstName}}
-             Last Name: {{order.lastName}}
-               Address: {{order.address}}
-                  City: {{order.city}}
-            <!-- 1.2) вивід типу отриманого значення -->
-                   Zip: {{typeof(order.zip)}}
-                 State: {{order.state}}
-                  Gift: {{order.gift}}
-                Method: {{order.method}}
-      Замовлені товари: {{cartItemsNames}}
+                        First Name: {{order.firstName}}
+                         Last Name: {{order.lastName}}
+                           Address: {{order.address}}
+                              City: {{order.city}}
+                        <!-- 1.2) вивід типу отриманого значення -->
+                               Zip: {{typeof(order.zip)}}
+                             State: {{order.state}}
+                              Gift: {{order.gift}}
+                            Method: {{order.method}}
+                  Замовлені товари: {{cartItemsNames}}
+ Дата та час формування замовлення: {{order.createdAt}}
           </pre>
         </div>
       </div>
@@ -166,7 +169,8 @@
           dontSendGift: 'Відправити у звичайній упаковці.',
           method: 'Домашня адреса',
           home: 'Домашня адреса',
-          business: 'Робоча адреса'
+          business: 'Робоча адреса',
+          createdAt: '-'
         },
         states: {
           AL: 'Alabama',
@@ -212,7 +216,12 @@
           this.showProduct = this.showProduct ? false : true;
         },
         submitForm() {
+          this.order.createdAt = new Date().toString();
           alert('OK!');
+        },
+        rejectForm() {
+          this.order.createdAt = '-';
+          alert('Order was rejected!');
         }
       },
       computed: {
@@ -240,7 +249,7 @@
             }
             prevName = productInfo.title;
           }
-          return itemsNames.toString();
+          return itemsNames.toString() || '-';
         }
       }
     });
