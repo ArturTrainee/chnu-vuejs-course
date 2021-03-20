@@ -53,8 +53,8 @@
           <div v-if="cartItemCount == 0">
             <p>Ви ще не додали товарів в корзину!</p>
           </div>
-          <div v-if="cartItemCount > 0" v-for="productId in cart">
-            <p>{{ productId }}</p>
+          <div v-if="cartItemCount > 0" v-for="itemInfo in cartItemsOccurrences">
+            <p>{{ itemInfo.id }}({{ itemInfo.count }})</p>
           </div>
         </div>
       </div>
@@ -159,6 +159,23 @@
         },
         canAddToCart: function() {
           return this.product.availableInventory > this.cartItemCount;
+        },
+        cartItemsOccurrences: function() {
+          let cartItemsOccurrences = [], prevId;
+          this.cart.sort();
+          for (let i = 0; i < this.cart.length; i++) {
+            const itemId = this.cart[i];
+            if (itemId !== prevId) {
+              cartItemsOccurrences.push({
+                id: itemId,
+                count: 1
+              });
+            } else {
+              cartItemsOccurrences[cartItemsOccurrences.length - 1].count += 1;
+            }
+            prevId = itemId;
+          }
+          return cartItemsOccurrences;
         }
       }
     });
