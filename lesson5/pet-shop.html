@@ -31,11 +31,34 @@
             </span>
             Checkout
           </button>
+          <div class="form-group">
+            <div class="col-md-6 boxes">
+              <input
+               type="checkbox"
+               id="prod-ids-checkbox"
+               value="false"
+               v-model="showCartProductsIds"
+               v-on:click="onCartCheckboxClick"
+               />
+              <label for="prod-ids-checkbox">показати id доданих товарів</label>
+            </div>
+          </div>
         </div>
       </div>
     </header>
     <main>
       <div v-if="showProduct">
+        <div v-if="showCartProductsIds" class="row">
+          <div class="col-md-2 col-md-offset-1">
+            <h4>ID доданих товарів:</h4>
+            <div v-if="cartItemCount == 0">
+              <p>Ви ще не додали товарів в корзину!</p>
+            </div>
+            <div v-if="cartItemCount > 0" v-for="itemInfo in cartItemsOccurrences">
+              <p>{{ itemInfo.id }}({{ itemInfo.count }})</p>
+            </div>
+          </div>
+        </div>
         <!-- 2) вказуємо обчислювану властивість замість поля -->
         <div v-for="product in sortedProducts">
           <div class="row product">
@@ -60,6 +83,10 @@
                       v-on:click="addToCart(product)"
                       v-if="canAddToCart(product)">Add to cart</button>
               <button class="btn btn-primary disabled" v-else>Add to cart</button>
+              <button class="btn btn-danger active"
+                      v-on:click="clearCart(product)"
+                      v-if="canClearCart(product)">Clear</button>
+              <button class="btn btn-danger disabled" v-else>Clear</button>
               <span class="inventory-message"
                     v-if="product.availableInventory - cartCount(product.id) === 0">
                 Товар закінчився!
@@ -153,6 +180,10 @@
                  State: {{order.state}}
                   Gift: {{order.gift}}
                 Method: {{order.method}}
+      Замовлені товари: 
+                      <span v-if="cartItemsOccurrences.length > 0" v-for="item in cartItemsOccurrences">
+                        {{item.title}} ({{item.count}})
+                      </span>
           </pre>
         </div>
       </div>
@@ -221,7 +252,8 @@
         lastName: 'Winters',
         prefix: 'Ms',
         emal: 'sw@vue.js',
-        password: '123456'
+        password: '123456',
+        showCartProductsIds: false,
       },
       filters: {
         formatPrice: function(price) {
@@ -267,6 +299,17 @@
             }
           }
           return count;
+        },
+        clearCart: function(aProduct) {
+          if (this.canClearCart(aProduct)) {
+            this.cart = this.cart.filter(productId => productId !== aProduct.id);
+          }
+        },
+        canClearCart: function(aProduct) {
+          return this.cartCount(aProduct.id) > 0;
+        },
+        onCartCheckboxClick() {
+          this.showCartProductsIds = !this.showCartProductsIds;
         }
       },
       computed: {
@@ -314,6 +357,24 @@
             count += this.productsCount[i].count;
           }
           return count;
+        },
+        cartItemsOccurrences: function() {
+          let cartItemsOccurrences = [], prevId;
+          this.cart.sort();
+          for (let i = 0; i < this.cart.length; i++) {
+            const itemId = this.cart[i];
+            if (itemId !== prevId) {
+              cartItemsOccurrences.push({
+                id: itemId,
+                title: this.sortedProducts.find(p => p.id === itemId).title,
+                count: 1
+              });
+            } else {
+              cartItemsOccurrences[cartItemsOccurrences.length - 1].count += 1;
+            }
+            prevId = itemId;
+          }
+          return cartItemsOccurrences;
         }
       }
     });
