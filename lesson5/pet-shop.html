@@ -21,6 +21,7 @@
           <h1 v-text="sitename"></h1>
           <p>Ласкаво просимо {{fullName}} у {{sitename}}</p>
           <p>Сьогодні у магазині загалом {{productsCount.length}} товарів, з яких можна придбати {{availableProductsCount}} товарів</p>
+          <p>Загальна кількість одиниць товарів: {{totalProductsCount}}</p>
         </div>
         <div class="nav navbar-nav navbar-right cart">
           <button type="button" class="btn btn-default btn-lg"
@@ -305,11 +306,14 @@
           return productsCount;
         },
         availableProductsCount() {
+          return this.totalProductsCount - this.cart.length;
+        },
+        totalProductsCount() {
           let count = 0;
           for (let i = 0; i < this.productsCount.length; i++) {
             count += this.productsCount[i].count;
           }
-          return count - this.cart.length;
+          return count;
         }
       }
     });
